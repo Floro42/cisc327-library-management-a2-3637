@@ -15,7 +15,7 @@ init_database()
 add_sample_data()
 
 def test_returns_correct_type():
-    assert isinstance(get_all_books(), List[Dict])
+    assert isinstance(get_all_books(), List)
 
 
 
@@ -34,4 +34,4 @@ def test_returns_empty_list():
     init_database()
 
     #Empty List
-    assert get_all_books() == False
+    assert get_all_books() == []
