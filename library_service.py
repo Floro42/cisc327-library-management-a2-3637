@@ -236,7 +236,7 @@ def search_books_in_catalog(search_term: str, search_type: str) -> List[Dict]:
     booksList = get_all_books
     listOfMatchingBooks = []
 
-    match search_type:
+    match search_term:
         #Returns partial/exact matching of titles
         case "title":
             for i in range(len(booksList) - 1):
