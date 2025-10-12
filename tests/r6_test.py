@@ -1,7 +1,19 @@
+import os
+from database import DATABASE, add_sample_data, init_database
 import pytest
 from library_service import (
     search_books_in_catalog, add_book_to_catalog
 )
+
+#clears the database of any previous runs of pytest so that new runs of pytest can run as expected
+@pytest.fixture(autouse=True, scope="module")
+def clearDatabase():
+    if os.path.exists(DATABASE):
+        os.remove(DATABASE)
+
+    init_database()
+    add_sample_data()
+
 """
 def test_valid_search_partial_matching_title():
     #Tests that the partial matching aspect of searching titles works properly

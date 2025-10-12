@@ -1,7 +1,18 @@
+from database import DATABASE, add_sample_data, init_database
 import pytest
 from library_service import(
     add_book_to_catalog, borrow_book_by_patron, get_patron_status_report
 )
+
+import os
+#clears the database of any previous runs of pytest so that new runs of pytest can run as expected
+@pytest.fixture(autouse=True, scope="module")
+def clearDatabase():
+    if os.path.exists(DATABASE):
+        os.remove(DATABASE)
+
+    init_database()
+    add_sample_data()
 
 """
 def test_valid_input_patron_status():
