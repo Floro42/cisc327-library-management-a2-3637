@@ -1,10 +1,12 @@
 import pytest
+import sys
+
 from library_service import (
     borrow_book_by_patron, add_book_to_catalog
 )
 
 import os
-from database import init_database, add_sample_data, DATABASE
+from database import init_database, add_sample_data, DATABASE, insert_book
 
 #clears the database of any previous runs of pytest so that new runs of pytest can run as expected
 @pytest.fixture(autouse=True, scope="module")
@@ -15,15 +17,15 @@ def clearDatabase():
     init_database()
     add_sample_data()
 
-"""def test_borrow_book_valid_input():
+def test_borrow_book_valid_input():
     #Test borrowing a book with valid input.
-    success, message = borrow_book_by_patron("123456", 9780743273565) 
+    success, message = borrow_book_by_patron("123456", 2) 
     
     print(message)
 
     assert success == True
     assert "successfully borrowed" in message.lower()
-    """
+
 
 
 
@@ -58,3 +60,6 @@ def test_borrow_book_no_copies():
     
     assert success == False
     assert "not found" in message
+
+
+test_borrow_book_valid_input()
