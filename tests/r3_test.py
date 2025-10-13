@@ -61,5 +61,3 @@ def test_borrow_book_no_copies():
     assert success == False
     assert "not found" in message
 
-
-test_borrow_book_valid_input()

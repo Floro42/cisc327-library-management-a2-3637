@@ -125,8 +125,8 @@ def return_book_by_patron(patron_id: str, book_id: int) -> Tuple[bool, str]:
     #Verifies that the patron has borrowed the book
     borrowedBooks = get_patron_borrowed_books(patron_id)
     bookBorrowed = False
-    for i in range(len(bookBorrowed) - 1):
-        if book_id not in borrowedBooks[i]:
+    for i in range(len(borrowedBooks) - 1):
+        if book_id != borrowedBooks[i]['book_id']:
             continue
         else:
             bookBorrowed = True
@@ -151,19 +151,13 @@ def calculate_late_fee_for_book(patron_id: str, book_id: int) -> Dict:
     #Check if patron id works
     if not patron_id or not patron_id.isdigit() or len(patron_id) != 6:
         return False, "Invalid patron ID. Must be exactly 6 digits."
-    
-    # Check if book exists and is available
-    book = get_book_by_id(book_id)
-    if not book:
-        return False, "Book not found."
-
 
     #Verifies that the patron has borrowed the book
     borrowedBooks = get_patron_borrowed_books(patron_id)
     bookBorrowed = False
     index = 0
     for i in range(len(borrowedBooks) - 1):
-        if book_id not in borrowedBooks[i]:
+        if book_id != borrowedBooks[i]['book_id']:
             continue
         else:
             bookBorrowed = True
@@ -171,6 +165,7 @@ def calculate_late_fee_for_book(patron_id: str, book_id: int) -> Dict:
             break
 
     if not bookBorrowed == False:
+        print("Book not borrowed")
         return {
         'fee_amount': 0.00,
         'days_overdue': 0,
@@ -178,7 +173,7 @@ def calculate_late_fee_for_book(patron_id: str, book_id: int) -> Dict:
         }
 
     #Finds difference between due date and current date
-    dueDate = datetime.strptime(bookBorrowed[index].get("borrow_date"), "%Y/%m/%d")
+    dueDate = datetime.strptime(borrowedBooks[index].get("borrow_date"), "%Y/%m/%d")
     currentDate = datetime.strptime(datetime.now, "%Y/%m/%d")
 
     daysOverdue = currentDate - dueDate
