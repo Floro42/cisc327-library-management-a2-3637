@@ -1,4 +1,5 @@
 from database import DATABASE, add_sample_data, init_database
+
 import pytest
 from services.library_service import (
     return_book_by_patron, borrow_book_by_patron, add_book_to_catalog
@@ -14,19 +15,20 @@ def clearDatabase():
     init_database()
     add_sample_data()
 
-"""
-def test_return_book_valid_input():
+
+def test_return_book_valid_input(mocker):
     #Tests returning a book with valid input
     borrow_book_by_patron("123456", 2)
+
+    mocker.patch("database.get_patron_borrowed_books", return_value = [{'book_id': 4}, {'book_id': 2}])
+
     result = return_book_by_patron("123456", 2)
     print(result[0])
     print(result[1])
 
-    #Should work, tested without the assertions, but assertions do not work for some reason
+    assert result[0] == True
+    assert "successfully returned" in result[1].lower()
 
-    #assert result[0] == True
-    #assert "successfully returned" in result[1].lower()
-"""
 
 def test_return_book_not_checked_out():
     #Tests returning a book that has not been checked out
@@ -50,3 +52,4 @@ def test_return_book_invalid_user_id():
     result = return_book_by_patron("1634733", 1234567892350123)
     assert result[0] == False
     assert "invalid patron id" in result[1].lower()
+

@@ -1,5 +1,7 @@
 import pytest
-
+from unittest.mock import (
+    Mock, patch
+)
 
 from services.library_service import (
     borrow_book_by_patron, add_book_to_catalog
@@ -55,9 +57,8 @@ def test_borrow_book_negative_book_id():
 
 def test_borrow_book_no_copies():
     """Test using a book with no copies"""
-    add_book_to_catalog("Test Book", "Test Author", "1234567890123", 0)
-    success, message = borrow_book_by_patron("123456", 1234567890123) 
+    success, message = borrow_book_by_patron("123456", 3) 
     
     assert success == False
-    assert "not found" in message
+    assert "not available" in message
 
