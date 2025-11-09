@@ -1,5 +1,7 @@
 import pytest
 
+import services.library_service
+
 from services.library_service import (
     add_book_to_catalog
 )
