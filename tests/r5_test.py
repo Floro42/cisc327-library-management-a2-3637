@@ -1,7 +1,7 @@
 import os
 from database import DATABASE, add_sample_data, init_database
 import pytest
-from library_service import (
+from services.library_service import (
     calculate_late_fee_for_book, borrow_book_by_patron, add_book_to_catalog
 )
 """

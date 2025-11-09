@@ -1,10 +1,9 @@
 import pytest
-import sys
-sys.path.append("..")
 
 from services.library_service import (
     add_book_to_catalog
 )
+
 
 import os
 from database import init_database, add_sample_data, DATABASE
