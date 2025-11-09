@@ -5,6 +5,15 @@ from library_service import (
     add_book_to_catalog
 )
 
+from database import init_database, add_sample_data, DATABASE
+
+#clears the database of any previous runs of pytest so that new runs of pytest can run as expected
+if os.path.exists(DATABASE):
+    os.remove(DATABASE)
+
+init_database()
+add_sample_data()
+
 def test_add_book_valid_input():
     """Test adding a book with valid input."""
     success, message = add_book_to_catalog("Test Book", "Test Author", "1234567890123", 5)

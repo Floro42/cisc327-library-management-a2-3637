@@ -8,11 +8,13 @@ import os
 from database import init_database, add_sample_data, DATABASE
 
 #clears the database of any previous runs of pytest so that new runs of pytest can run as expected
-if os.path.exists(DATABASE):
-    os.remove(DATABASE)
+@pytest.fixture(autouse=True, scope="module")
+def clearDatabase():
+    if os.path.exists(DATABASE):
+        os.remove(DATABASE)
 
-init_database()
-add_sample_data()
+    init_database()
+    add_sample_data()
 
 def test_returns_correct_type():
     assert isinstance(get_all_books(), List)

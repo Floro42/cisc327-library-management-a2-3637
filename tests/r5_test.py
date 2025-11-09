@@ -1,8 +1,20 @@
+import os
+from database import DATABASE, add_sample_data, init_database
 import pytest
 from library_service import (
     calculate_late_fee_for_book, borrow_book_by_patron, add_book_to_catalog
 )
 """
+#clears the database of any previous runs of pytest so that new runs of pytest can run as expected
+@pytest.fixture(autouse=True, scope="module")
+def clearDatabase():
+    if os.path.exists(DATABASE):
+        os.remove(DATABASE)
+
+    init_database()
+    add_sample_data()
+    
+    
 def test_late_fee_book_not_checked_out():
     #Tests calculating a late fee for book not borrowed by patron
     add_book_to_catalog("Test Book", "Test Author", "1234567890123", 5)
@@ -37,5 +49,4 @@ def test_late_fee_book_invalid_user_id():
     assert fee_dict["fee_amount"] == None
     assert fee_dict["days_overdue"] == None
     assert "invalid user id" in fee_dict["status"].lower()
-
-    """
+"""
