@@ -14,7 +14,7 @@ def clearDatabase():
     init_database()
     add_sample_data()
 
-"""
+
 def test_valid_search_partial_matching_title():
     #Tests that the partial matching aspect of searching titles works properly
     add_book_to_catalog("abcdefghijklmnop", "Test Author", "1234567890123", 5)
@@ -44,5 +44,3 @@ def test_search_no_results():
     results = search_books_in_catalog("1234567890123", "exact")
     #checking to see if the dictionary of results is empty
     assert results == False
-
-"""

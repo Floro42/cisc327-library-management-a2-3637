@@ -176,10 +176,10 @@ def calculate_late_fee_for_book(patron_id: str, book_id: int) -> Dict:
         }
 
     #Finds difference between due date and current date
-    dueDate = datetime.strptime(borrowedBooks[index].get("borrow_date"), "%Y/%m/%d")
-    currentDate = datetime.strptime(datetime.now, "%Y/%m/%d")
+    #dueDate = datetime.strptime(borrowedBooks[index].get("borrow_date"), "%Y/%m/%d")
+    #currentDate = datetime.strptime(datetime.now, "%Y/%m/%d")
 
-    daysOverdue = currentDate - dueDate
+    daysOverdue = borrowedBooks[index].get("borrow_date") - datetime.now
 
     #Rounds number of days overdue to an int
     daysOverdue = int(daysOverdue.days)

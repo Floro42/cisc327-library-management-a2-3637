@@ -14,7 +14,7 @@ def clearDatabase():
     init_database()
     add_sample_data()
 
-"""
+
 def test_valid_input_patron_status():
     add_book_to_catalog("Test Book", "Test Author", "1234567890123", 5)
     borrow_book_by_patron("123456", 1234567890123) 
@@ -39,4 +39,3 @@ def test_patron_id_too_long():
 def test_patron_status_no_books_borrowed():
     results = get_patron_status_report("123456")
     assert results["currently borrowed"] == False
-"""
