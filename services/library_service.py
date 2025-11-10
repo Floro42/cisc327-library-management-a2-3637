@@ -3,7 +3,7 @@ Library Service Module - Business Logic Functions
 Contains all the core business logic for the Library Management System
 """
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 from database import (
     get_book_by_id, get_book_by_isbn, get_db_connection, get_patron_borrow_count,
@@ -153,33 +153,39 @@ def calculate_late_fee_for_book(patron_id: str, book_id: int) -> Dict:
      """
     #Check if patron id works
     if not patron_id or not patron_id.isdigit() or len(patron_id) != 6:
-        return False, "Invalid patron ID. Must be exactly 6 digits."
+        return {
+            'fee_amount' : 0.00,
+            'days_overdue' : 0,
+            'status' : "Invalid patron ID. Must be exactly 6 digits."
+        }
 
     #Verifies that the patron has borrowed the book
     borrowedBooks = get_patron_borrowed_books(patron_id)
     bookBorrowed = False
     index = 0
-    for i in range(len(borrowedBooks) - 1):
+
+    #print(str(borrowedBooks))
+
+    #print("Book_ID: " + str(borrowedBooks[0].get('book_id')) + " Given ID:"  + str(book_id))
+
+    for i in range(len(borrowedBooks)):
         if book_id != borrowedBooks[i]['book_id']:
-            continue
-        else:
+            print("Book_ID: " + str(borrowedBooks[i]['book_id']) + "Given ID: " + str(book_id))
+        elif book_id == borrowedBooks[i]['book_id']:
+            print("YIPPEE")
             bookBorrowed = True
             index = i
             break
 
-    if not bookBorrowed == False:
-        print("Book not borrowed")
+    if bookBorrowed == False:
         return {
         'fee_amount': 0.00,
         'days_overdue': 0,
-        'status': 'Book not overdue'
+        'status': 'Book not borrowed'
         }
 
-    #Finds difference between due date and current date
-    #dueDate = datetime.strptime(borrowedBooks[index].get("borrow_date"), "%Y/%m/%d")
-    #currentDate = datetime.strptime(datetime.now, "%Y/%m/%d")
 
-    daysOverdue = borrowedBooks[index].get("borrow_date") - datetime.now
+    daysOverdue = date(datetime.now) - date(borrowedBooks[index].get("borrow_date"))
 
     #Rounds number of days overdue to an int
     daysOverdue = int(daysOverdue.days)
@@ -231,7 +237,7 @@ def search_books_in_catalog(search_term: str, search_type: str) -> List[Dict]:
     TODO: Implement R6 as per requirements
     """
 
-    booksList = get_all_books
+    booksList = get_all_books()
     listOfMatchingBooks = []
 
     match search_term:
@@ -253,6 +259,7 @@ def search_books_in_catalog(search_term: str, search_type: str) -> List[Dict]:
             
         #Returns exact match of isbn
         case "isbn":
+            print(str(get_book_by_isbn(search_term)))
             return [get_book_by_isbn(search_term)]
         
         case _:

@@ -31,11 +31,11 @@ def test_pay_late_fee_successful(mocker):
 
 def test_pay_late_fee_declined_by_gateway(mocker):
 
-    mocker.patch("services.library_service.calculate_late_fee_for_book", return_value={"fee_amount": 16.00, "days_overdue": 3})
+    mocker.patch("services.library_service.calculate_late_fee_for_book", return_value={"fee_amount": 1001.00, "days_overdue": 3})
     mocker.patch("services.library_service.get_book_by_id", return_value={"title": "Sample"})
 
     mock_gateway = Mock(spec=PaymentGateway)
-    mock_gateway.process_payment.return_value = (False, "", "Invalid amount: must be greater than 0")
+    mock_gateway.process_payment.return_value = (False, "", "Payment declined: amount exceeds limit")
     success, msg, txn = pay_late_fees("123456", 1, mock_gateway)
 
     #mock_gateway.process_payment.assert_called_once()
@@ -85,7 +85,6 @@ def test_pay_late_fee_network_error_exception(mocker):
     mocker.patch("services.library_service.calculate_late_fee_for_book", return_value={"fee_amount": 2.00, "days_overdue": 1})
     mocker.patch("services.library_service.get_book_by_id", return_value={"title": "Sample"})
 
-    #TODO: Figure out how to do a network error
     mock_gateway = Mock(spec=PaymentGateway)
     mock_gateway.process_payment.return_value = (Exception)
     success, msg, txn = pay_late_fees("123456", 1, mock_gateway)
@@ -93,6 +92,35 @@ def test_pay_late_fee_network_error_exception(mocker):
     assert success == False
     assert "error" in msg.lower()
     assert txn is None
+
+
+
+def test_pay_late_fee_no_fee_amount(mocker):
+    mocker.patch("services.library_service.calculate_late_fee_for_book", return_value=None)
+    mocker.patch("services.library_service.get_book_by_id", return_value={"title": "Sample"})
+
+    mock_gateway = Mock(spec=PaymentGateway)
+    mock_gateway.process_payment.return_value = (Exception)
+    success, msg, txn = pay_late_fees("123456", 1, mock_gateway)
+
+    assert success == False
+    assert "unable" in msg.lower()
+    assert txn is None
+
+
+
+def test_pay_late_fee_network_no_book(mocker):
+    mocker.patch("services.library_service.calculate_late_fee_for_book", return_value={"fee_amount": 2.00, "days_overdue": 1})
+    mocker.patch("services.library_service.get_book_by_id", return_value=None)
+
+    mock_gateway = Mock(spec=PaymentGateway)
+    mock_gateway.process_payment.return_value = (Exception)
+    success, msg, txn = pay_late_fees("123456", 1, mock_gateway)
+
+    assert success == False
+    assert "not found" in msg.lower()
+    assert txn is None
+
 
 
 
@@ -137,3 +165,38 @@ def test_refund_late_fee_payment_invalid_refund_amount():
     assert "greater than" in message.lower()
     
     mock_gateway.refund_payment.assert_not_called()
+
+
+
+def test_refund_late_fee_payment_invalid_refund_amount_higher():
+    mock_gateway = Mock(spec=PaymentGateway)
+    mock_gateway.refund_payment.return_value = (False, "Invalid refund amount")
+    success, message = refund_late_fee_payment("txn_123", 16.00, mock_gateway)
+
+    assert success == False
+    assert "exceeds" in message.lower()
+    
+    mock_gateway.refund_payment.assert_not_called()
+
+
+
+def test_refund_late_fee_payment_failed_payment():
+    mock_gateway = Mock(spec=PaymentGateway)
+    mock_gateway.refund_payment.return_value = (False, "Invalid refund amount")
+    success, message = refund_late_fee_payment("txn_123", 7.00, mock_gateway)
+
+    assert success == False
+    assert "failed" in message.lower()
+
+
+
+
+def test_refund_late_fee_payment_exception():
+    mock_gateway = Mock(spec=PaymentGateway)
+    mock_gateway.refund_payment.return_value = (Exception)
+    success, message = refund_late_fee_payment("txn_123", 7.00, mock_gateway)
+
+    assert success == False
+    assert "error" in message.lower()
+    
+    mock_gateway.refund_payment.assert_called_once()
