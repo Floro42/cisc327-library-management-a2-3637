@@ -90,6 +90,9 @@ def test_pay_late_fee_network_error_exception(mocker):
     mock_gateway.process_payment.return_value = (Exception)
     success, msg, txn = pay_late_fees("123456", 1, mock_gateway)
 
+    mock_gateway.process_payment.assert_called_once()
+    mock_gateway.process_payment.assert_called_with(patron_id='123456', amount=2.0, description="Late fees for 'Sample'")
+
     assert success == False
     assert "error" in msg.lower()
     assert txn is None
@@ -104,6 +107,8 @@ def test_pay_late_fee_no_fee_amount(mocker):
     mock_gateway.process_payment.return_value = (Exception)
     success, msg, txn = pay_late_fees("123456", 1, mock_gateway)
 
+    mock_gateway.process_payment.assert_not_called()
+
     assert success == False
     assert "unable" in msg.lower()
     assert txn is None
@@ -117,6 +122,8 @@ def test_pay_late_fee_network_no_book(mocker):
     mock_gateway = Mock(spec=PaymentGateway)
     mock_gateway.process_payment.return_value = (Exception)
     success, msg, txn = pay_late_fees("123456", 1, mock_gateway)
+
+    mock_gateway.process_payment.assert_not_called()
 
     assert success == False
     assert "not found" in msg.lower()
@@ -188,7 +195,8 @@ def test_refund_late_fee_payment_failed_payment():
 
     assert success == False
     assert "failed" in message.lower()
-
+    mock_gateway.refund_payment.assert_called_once()
+    mock_gateway.refund_payment.assert_called_with("txn_123", 7.00)
 
 
 
@@ -200,4 +208,6 @@ def test_refund_late_fee_payment_exception():
     assert success == False
     assert "error" in message.lower()
     
+
     mock_gateway.refund_payment.assert_called_once()
+    mock_gateway.refund_payment.assert_called_with("txn_123", 7.00)
