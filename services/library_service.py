@@ -128,8 +128,7 @@ def return_book_by_patron(patron_id: str, book_id: int) -> Tuple[bool, str]:
     bookBorrowed = False
 
     for i in range(len(borrowedBooks)):
-        if book_id != borrowedBooks[i]['book_id']:
-            print(borrowedBooks[i]['book_id'])
+        if book_id != borrowedBooks[i]['book_id']:        
             continue
         else:
             bookBorrowed = True
@@ -164,15 +163,10 @@ def calculate_late_fee_for_book(patron_id: str, book_id: int) -> Dict:
     bookBorrowed = False
     index = 0
 
-    #print(str(borrowedBooks))
-
-    #print("Book_ID: " + str(borrowedBooks[0].get('book_id')) + " Given ID:"  + str(book_id))
-
     for i in range(len(borrowedBooks)):
         if book_id != borrowedBooks[i]['book_id']:
-            print("Book_ID: " + str(borrowedBooks[i]['book_id']) + "Given ID: " + str(book_id))
+            continue
         elif book_id == borrowedBooks[i]['book_id']:
-            print("YIPPEE")
             bookBorrowed = True
             index = i
             break
@@ -184,8 +178,10 @@ def calculate_late_fee_for_book(patron_id: str, book_id: int) -> Dict:
         'status': 'Book not borrowed'
         }
 
+    due_date = borrowedBooks[index].get("borrow_date")
+    today = datetime.now()
 
-    daysOverdue = date(datetime.now) - date(borrowedBooks[index].get("borrow_date"))
+    daysOverdue = today - due_date
 
     #Rounds number of days overdue to an int
     daysOverdue = int(daysOverdue.days)
@@ -238,9 +234,10 @@ def search_books_in_catalog(search_term: str, search_type: str) -> List[Dict]:
     """
 
     booksList = get_all_books()
+
     listOfMatchingBooks = []
 
-    match search_term:
+    match search_type:
         #Returns partial/exact matching of titles
         case "title":
             for i in range(len(booksList) - 1):
@@ -254,12 +251,11 @@ def search_books_in_catalog(search_term: str, search_type: str) -> List[Dict]:
             for i in range(len(booksList) - 1):
                 if search_term.lower() in booksList[i]['author'].lower():
                     listOfMatchingBooks.append(booksList[i])
-                
+            
             return listOfMatchingBooks
             
         #Returns exact match of isbn
         case "isbn":
-            print(str(get_book_by_isbn(search_term)))
             return [get_book_by_isbn(search_term)]
         
         case _:
@@ -275,7 +271,9 @@ def get_patron_status_report(patron_id: str) -> Dict:
     """
 
     if not patron_id or not patron_id.isdigit() or len(patron_id) != 6:
-        raise Exception("Invalid patron ID. Must be exactly 6 digits.")
+        return {
+        "error" : "invalid patron ID"
+    }
     
     currentlyBorrowedBooks = get_patron_borrowed_books(patron_id)
 

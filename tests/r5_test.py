@@ -20,15 +20,15 @@ def clearDatabase():
     init_database()
     add_sample_data()
     
-"""
+
 def test_late_fee_book_not_checked_out():
     #Tests calculating a late fee for book not borrowed by patron
     add_book_to_catalog("Test Book", "Test Author", "1234567890123", 5)
     fee_dict = calculate_late_fee_for_book("123456", 1234567890123)
-    assert fee_dict["fee_amount"] == None
-    assert fee_dict["days_overdue"] == None
+    assert fee_dict["fee_amount"] == 0
+    assert fee_dict["days_overdue"] == 0
     assert "book not borrowed" in fee_dict["status"].lower()
-"""
+
     
 
 def test_late_fee_book_valid_input(mocker):
@@ -39,17 +39,17 @@ def test_late_fee_book_valid_input(mocker):
         {'book_id': 2, 'borrow_date': datetime.date(2025,8,9)}
         ]
 
-    mocker.patch("database.get_patron_borrowed_books", return_value = tweaking)
+    mocker.patch("database.get_patron_borrowed_books", return_value = [{'book_id': 4}, {'book_id': 2}])
 
-    fee_dict = calculate_late_fee_for_book("654321", 5)
-    assert fee_dict["fee_amount"] == 0.00
-    assert fee_dict["days_overdue"] == 0
-    assert "late fee is" in fee_dict["status"].lower()
-
-
+    fee_dict = calculate_late_fee_for_book("123456", 3)
+    assert fee_dict["fee_amount"] > 0
+    assert fee_dict["days_overdue"] > 0
+    assert "overdue" in fee_dict["status"].lower()
 
 
-"""def test_late_fee_book_invalid_book_id(mocker):
+
+
+def test_late_fee_book_invalid_book_id(mocker):
     #Tests calculating late fee with invalid book ID
 
     mocker.patch("database.get_patron_borrowed_books", return_value = [{'book_id': 4}, {'book_id': 2}])
@@ -57,7 +57,8 @@ def test_late_fee_book_valid_input(mocker):
     fee_dict = calculate_late_fee_for_book("123456", 1234567890123523523)
     assert fee_dict["fee_amount"] == 0.0
     assert fee_dict["days_overdue"] == 0
-    assert "not borrowed" in fee_dict["status"].lower()"""
+    assert "not borrowed" in fee_dict["status"].lower()
+
 
 def test_late_fee_book_invalid_user_id():
     #Tests calculating late fee with invalid user ID

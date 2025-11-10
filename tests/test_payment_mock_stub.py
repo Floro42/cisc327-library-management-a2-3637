@@ -31,19 +31,20 @@ def test_pay_late_fee_successful(mocker):
 
 def test_pay_late_fee_declined_by_gateway(mocker):
 
-    mocker.patch("services.library_service.calculate_late_fee_for_book", return_value={"fee_amount": 1001.00, "days_overdue": 3})
+    mocker.patch("services.library_service.calculate_late_fee_for_book", return_value={"fee_amount": 10.00, "days_overdue": 3})
     mocker.patch("services.library_service.get_book_by_id", return_value={"title": "Sample"})
 
     mock_gateway = Mock(spec=PaymentGateway)
     mock_gateway.process_payment.return_value = (False, "", "Payment declined: amount exceeds limit")
     success, msg, txn = pay_late_fees("123456", 1, mock_gateway)
 
-    #mock_gateway.process_payment.assert_called_once()
-    #mock_gateway.process_payment.assert_called_with("123456", -1.00, "Late fees for 'Sample'")
-
     assert success == False
     assert "failed" in msg.lower()
     assert txn is None
+
+    #mock_gateway.process_payment.assert_called_once()
+    #mock_gateway.process_payment.assert_called_with("123456", 10.00, "Late fees for 'Sample'")
+
 
     
 

@@ -14,31 +14,27 @@ def clearDatabase():
     init_database()
     add_sample_data()
 
-"""
+
 def test_valid_search_partial_matching_title():
     #Tests that the partial matching aspect of searching titles works properly
-    add_book_to_catalog("abcdefghijklmnop", "Test Author", "1234567890123", 5)
-    results = search_books_in_catalog("abcdef", "partial")
+    results = search_books_in_catalog("19", "title")
     #assumption of how the keys work linking numbers of most relevant searches to best matching titles
-    assert results[0].lower() == "abcdefghijklmnop"
+    assert results[0]['title'].lower() == "1984"
 
 
 def test_valid_search_partial_matching_author():
     #Tests that the partial matching aspect of searching authors works properly
-    add_book_to_catalog("abcdefghijklmnop", "Test Author", "1234567890123", 5)
-    results = search_books_in_catalog("test", "partial")
+    results = search_books_in_catalog("george", "author")
     #assumption of how the keys work linking numbers of most relevant searches to best matching titles
-    assert results[0].lower() == "abcdefghijklmnop"
-"""
+    assert results[0]['title'].lower() == "1984"
+
 
 def test_valid_search_exact_matching_isbn(mocker):
     #Tests that the exact matching aspect of searching isbn works properly
-    
-    mocker.patch("database.get_book_by_isbn", return_value = "abcdefghijklmnop")
 
-    results = search_books_in_catalog("1234567890123", "exact")
+    results = search_books_in_catalog("9780451524935", "isbn")
     #assumption of how the keys work linking numbers of most relevant searches to best matching titles
-    assert results[0].lower() == "abcdefghijklmnop"
+    assert results[0]['title'].lower() == "1984"
 
 
 def test_search_no_results():
