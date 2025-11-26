@@ -2,14 +2,22 @@
 Catalog Routes - Book catalog related endpoints
 """
 
+import os
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from database import get_all_books
+from database import DATABASE, add_sample_data, get_all_books, init_database
 from services.library_service import add_book_to_catalog
 
 catalog_bp = Blueprint('catalog', __name__)
 
 @catalog_bp.route('/')
 def index():
+    """Home page redirects to catalog."""
+    #Resets the catalog on a return to homepage for testing
+    if os.path.exists(DATABASE):
+        os.remove(DATABASE)
+
+    init_database()
+    add_sample_data()
     """Home page redirects to catalog."""
     return redirect(url_for('catalog.catalog'))
 

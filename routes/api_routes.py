@@ -2,7 +2,9 @@
 API Routes - JSON API endpoints
 """
 
+import os
 from flask import Blueprint, jsonify, request
+from database import DATABASE, add_sample_data, init_database
 from services.library_service import calculate_late_fee_for_book, search_books_in_catalog
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
