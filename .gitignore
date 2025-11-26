@@ -3,4 +3,4 @@
 !tests
 !playwright.config.ts
 !tests/example.spec.ts
-
+!tests/test_e2e.py
