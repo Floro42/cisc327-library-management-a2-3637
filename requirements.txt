@@ -4,4 +4,3 @@ requests
 pytest-mock
 playwright
 pytest-playwright
-playwright install
